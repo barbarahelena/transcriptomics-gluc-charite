@@ -18,7 +18,7 @@ See the `plots.R` script. The following plots were drawn:
 - Boxplots
 
 ## Pathway analyses
-Pathway analyses were performed using GO and KEGG. There were no significantly expressed pathways (padj < 0.1). One of the KEGG pathways with the lowest p-values was the hsa01522 "Endocrine resistance" pathway. That pathway, although not significant, was visualized. Plots can be found in the hsa01522 folder, in the pdf folder of the results.
+Pathway analyses were performed using GO and KEGG (see `pathwayanalysis.R`). There were no significant pathways (padj < 0.1). One of the KEGG pathways with the lowest p-values was the hsa01522 "Endocrine resistance" pathway. That pathway, although not significant, was visualized. Plots can be found in the hsa01522 folder, in the pdf folder of the results.
 
 ## Data availability
 Data will be made available on ENA. As soon as the data are available, the repository link will be made available here.
