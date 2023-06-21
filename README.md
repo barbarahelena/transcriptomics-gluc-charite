@@ -8,8 +8,10 @@ Sequence reads were trimmed to remove possible adapter sequences and nucleotides
 
 Unique gene hit counts were calculated by using featureCounts from the Subread package v.1.5.2. The hit counts were summarized and reported using the gene_id feature in the annotation file. Only unique reads that fell within exon regions were counted. If a strand-specific library preparation was performed, the reads were strand-specifically counted.
 
+Mean total reads for 6 samples was 25900258, with an SD of 2101237 of which 99.2% were mapped. Mean total counts were 22802992 with an SD of 1813921.
+
 ## DGE analyses
-Genes with less than 5 counts across samples were filtered out. We used DESeq2 (v.1.36.0) to assess the differentially expressed genes between control and glucagon-stimulated samples (see `deseq2.R`). For these analyses, the formula Gene ~ Condition was used, with a Wald test and parametric fit. Genes with a P-value <0.01 were considered as differentially expressed between control and glucagon conditions. Gene counts were normalized using DESeq2’s median of ratios method to account for sequencing depth and RNA composition. 
+Genes with less than 5 counts across samples were filtered out. We used DESeq2 (v.1.36.0) to assess the differentially expressed genes between control and glucagon-stimulated samples (see `deseq2.R`). For these analyses, the formula Gene ~ Condition was used, with a Wald test and parametric fit. Genes with a P-value <0.01 were considered as differentially expressed between control and glucagon conditions. Gene counts were normalized using DESeq2’s median of ratios method to account for sequencing depth and RNA composition.
 
 ## Plots
 See the `plots.R` script. The following plots were drawn:
