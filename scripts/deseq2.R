@@ -24,10 +24,10 @@ print(str_c("Mean total reads for ", sampleno, " samples was: ", format(mean(sum
 
 ## Open raw count file
 rawCounts <- read.csv('data/01_analysis/DEG/deseq2/Control-vs-Stimulation/counts/raw_counts.csv')
-rawCounts$Gene.ID <- rawCounts$X
-rawCounts$X <- NULL
 print(str_c("Mean total counts for ", sampleno, " samples was: ", mean(colSums(rawCounts[,-1])), 
             " with an SD of: ", sd(colSums(rawCounts[,-1]))))
+rawCounts$Gene.ID <- rawCounts$X
+rawCounts$X <- NULL
 
 ## Open sample mapping
 sampleData <- read.delim("data/01_analysis/DEG/deseq2/Control-vs-Stimulation/testCondition.txt")
@@ -66,8 +66,8 @@ deseq2Data <- DESeqDataSetFromMatrix(countData=rawCounts, colData=sampleData, de
 
 # Prefiltering data (low counts)
 dim(deseq2Data)
-dim(deseq2Data[rowSums(counts(deseq2Data)) > 15, ])
-deseq2Data <- deseq2Data[rowSums(counts(deseq2Data)) > 15, ]
+dim(deseq2Data[rowSums(counts(deseq2Data) >= 15 ) >= 3, ]) # 14,165 of 57,500
+deseq2Data <- deseq2Data[rowSums(counts(deseq2Data) >= 15 ) >= 3, ]
 
 # Run pipeline for differential expression steps 
 deseq2Data <- DESeq(deseq2Data)
@@ -79,13 +79,13 @@ deseq2Results$ENSEMBL <- rownames(deseq2Results)
 
 summary(deseq2Results)
 
-# out of 21475 with nonzero total read count
+# out of 14165 with nonzero total read count
 # adjusted p-value < 0.1
 # LFC > 0 (up)       : 0, 0%
 # LFC < 0 (down)     : 0, 0%
 # outliers [1]       : 0, 0%
 # low counts [2]     : 0, 0%
-# (mean count < 1)
+# (mean count < 12)
 # [1] see 'cooksCutoff' argument of ?results
 # [2] see 'independentFiltering' argument of ?results
 
