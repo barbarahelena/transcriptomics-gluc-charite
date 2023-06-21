@@ -177,9 +177,6 @@ heatmap_plot_p_anno <- function(df, group = "unequal", number = 100) {
 
 ## Data
 df <- read.csv2("data/230620_deseq2results.csv")
-# df_old <- read.csv("data/DEG/deseq2/Ctrl-vs-Treatment/Differential_expression_analysis_table.csv")
-# df_counts <- read.csv("data/DEG/deseq2/Ctrl-vs-Treatment/counts/normalized_counts.csv")
-# df_raw <- read.csv("data/DEG/deseq2/Ctrl-vs-Treatment/counts/raw_counts.csv")
 names(df)
 df$X <- NULL
 
@@ -190,37 +187,34 @@ df$group <- case_when(
 df$sig <- case_when(df$pvalue < 0.05 ~ paste0("sig"), 
                   df$pvalue >0.05 ~ paste0("insig"))
 df$Gene.name <- df$symbol
-
-# df$missing <- case_when(df$X12h.100.nM.ImP.3 == 0 | df$X12h.100.nM.ImP.2 == 0 | df$X12h.100.nM.ImP.1 == 0 |
-#                             df$X12h.Ctrl.1 == 0 | df$X12h.Ctrl.2 == 0 | df$X12h.Ctrl.1 == 0 ~ TRUE)
-
-# dfsig <- df %>% filter(pvalue < 0.05)
 df$padj2 <- p.adjust(df$pvalue, method = "BH", n = length(df$pvalue))
 summary(is.na(df$padj))
 
 df2 <- df %>% group_by(group) %>% 
-    arrange(padj) %>% 
-    dplyr::filter(pvalue < 0.01) %>% 
+    arrange(pvalue) %>% 
     ungroup(.) %>% 
+    slice_head(n = 20) %>% 
     arrange(log2FoldChange) %>% 
     mutate(Gene.name = forcats::fct_inorder(symbol))
 nrow(df2)
+head(df2)
 
+## DEG barplot
 ggplot(df2, aes(x = Gene.name, y = log2FoldChange, fill = forcats::fct_rev(group))) +
         theme_Publication() +
         geom_bar(stat = "identity", alpha = 0.8) +
         #scale_y_continuous(breaks = c(-4,-3,-2,-1,0,1)) +
         ggsci::scale_fill_lancet() +
         coord_flip() +
-        labs(y = 'Log 2 fold change with Gcg', x='', 
-             title = 'Differential gene expression',
+        labs(y = 'Log2 fold change with Gcg', x='', 
+             title = 'Differential gene expression: top 20 genes',
              fill = '') +
         theme(axis.text.x = element_text(size=11)) + 
         theme(axis.text.y = element_text(size=10)) +
         theme(legend.key.size= unit(0.5, "cm")) +
         theme(legend.position = 'none', legend.justification = 'center')
-ggsave("results/pdf/230620_diff_exp_sig.pdf", height = 10, width = 6, device = "pdf")
-ggsave("results/svg/230620_diff_exp_sig.svg", height = 10, width = 6, device = "svg")
+ggsave("results/pdf/230620_diff_exp_sig.pdf", height = 6, width = 6, device = "pdf")
+ggsave("results/svg/230620_diff_exp_sig.svg", height = 6, width = 6, device = "svg")
 
 df5 <- df %>% group_by(group) %>% 
     arrange(pvalue) %>% 
@@ -235,15 +229,15 @@ ggplot(df5, aes(x = Gene.name, y = log2FoldChange, fill = forcats::fct_rev(group
     #scale_y_continuous(breaks = c(-0.50, -0.25, 0, 0.25, 0.50), limits = c(-0.60, 0.60)) +
     ggsci::scale_fill_lancet() +
     coord_flip() +
-    labs(y = 'Log 2 fold change with Gcg', x='', 
+    labs(y = 'Log2 fold change with Gcg', x='', 
          title = 'Differential gene expression',
          fill = '') +
     theme(axis.text.x = element_text(size=11)) + 
     theme(axis.text.y = element_text(size=10)) +
     theme(legend.key.size= unit(0.5, "cm")) +
     theme(legend.position = 'none', legend.justification = 'center')
-ggsave("results/pdf/230620_diff_exp_top20.pdf", height = 6, width = 5, device = "pdf")
-ggsave("results/svg/230620_diff_exp_top20.svg", height = 6, width = 5, device = "svg")
+ggsave("results/pdf/230620_diff_exp_top20_2sides.pdf", height = 6, width = 5, device = "pdf")
+ggsave("results/svg/230620_diff_exp_top20_2sides.svg", height = 6, width = 5, device = "svg")
 
 pdf("results/pdf/230620_heatmap_significant.pdf", width = 8, height = 6)
 heatmap_plot(df, group = "sig", number = 20)
@@ -279,7 +273,7 @@ for(a in 1:nrow(df2)){
                       aes(x=group2, y=mean_count, ymin=mean_count, 
                           ymax=mean_count+(sd_count/sqrt(3))), width = 0.5) +
             geom_jitter(color = "black", width = 0.2, height = 0) +
-            ggpubr::geom_pwc(method = "wilcox.test", label = "p.signif", comparisons = comp,
+            ggpubr::geom_pwc(method = "t.test", label = "p.signif", comparisons = comp,
                              hide.ns = TRUE, bracket.nudge.y = 1, label.size = 5) +
         ylim(NA, max(genetab$value)*1.3) +
         scale_fill_manual(guide = "none", values = c("white",ggsci::pal_lancet()(2)[2])) +
@@ -291,12 +285,12 @@ for(a in 1:nrow(df2)){
     res[[a]] <- pl
 }
 
-pdf("results/pdf/boxplots_counts.pdf", width = 13, height = 26)
-grid.arrange(grobs=res, ncol=7)
+pdf("results/pdf/boxplots_counts.pdf", width = 10, height = 12)
+grid.arrange(grobs=res, ncol=5)
 dev.off()
 
-svg("results/svg/boxplots_counts.svg", width = 13, height = 26)
-grid.arrange(grobs=res, ncol=7)
+svg("results/svg/boxplots_counts.svg", width = 10, height = 12)
+grid.arrange(grobs=res, ncol=5)
 dev.off()
 
 
