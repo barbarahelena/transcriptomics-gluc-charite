@@ -66,14 +66,14 @@ deseq2Data <- DESeqDataSetFromMatrix(countData=rawCounts, colData=sampleData, de
 
 # Prefiltering data (low counts)
 dim(deseq2Data)
-dim(deseq2Data[rowSums(counts(deseq2Data)) > 5, ])
-deseq2Data <- deseq2Data[rowSums(counts(deseq2Data)) > 5, ]
+dim(deseq2Data[rowSums(counts(deseq2Data)) > 15, ])
+deseq2Data <- deseq2Data[rowSums(counts(deseq2Data)) > 15, ]
 
 # Run pipeline for differential expression steps 
 deseq2Data <- DESeq(deseq2Data)
 
 # Extract differential expression results
-deseq2Results <- results(deseq2Data, contrast=c("condition", "Treatment", "Control"),
+deseq2Results <- results(deseq2Data, contrast=c("condition", "Control", "Treatment"),
                          alpha = 0.1)
 deseq2Results$ENSEMBL <- rownames(deseq2Results)
 
@@ -91,7 +91,7 @@ summary(deseq2Results)
 
 plotMA(deseq2Results)
 
-deseq2Results[which(deseq2Results$pvalue < 0.1),]
+deseq2Results[which(deseq2Results$pvalue < 0.01),]
 
 library(EnsDb.Hsapiens.v86)
 deseq2Results$symbol <- mapIds(EnsDb.Hsapiens.v86, keys=deseq2Results$ENSEMBL,

@@ -84,7 +84,7 @@ heatmap_plot <- function(df, group = "unequal", number = 100) {
             column_order = colnames(df3_counts)[1:6],
             clustering_method_rows = "ward.D2",
             top_annotation = HeatmapAnnotation(Treatment = anno_block(
-                                                gp = gpar(fill = c("black", "firebrick1"))),
+                                                gp = gpar(fill = c("black", "red"))),
                                                height = unit(0.2, "cm")),
             width = unit(6, "cm"), row_names_side = "left", column_gap = unit(2, "mm"),
             row_dend_side = "right",
@@ -92,6 +92,86 @@ heatmap_plot <- function(df, group = "unequal", number = 100) {
             row_names_max_width = max_text_width(
                 rownames(df3_counts),
                 gp = gpar(fontsize = 10)))
+}
+
+heatmap_plot_p_anno <- function(df, group = "unequal", number = 100) {
+    df <- df %>% mutate(sig = case_when(
+        pvalue >= 0.05 ~ paste0(""),
+        pvalue < 0.0001 ~ paste0("****"),
+        pvalue < 0.001 ~ paste0("***"),
+        pvalue < 0.01 ~ paste0("**"),
+        pvalue < 0.05 ~ paste0("*")
+    ))
+    
+    if (group == "unequal")
+        df3 <- df %>% group_by(group) %>% 
+            arrange(pvalue) %>% 
+            dplyr::slice(1:number) %>% 
+            ungroup(.) %>% 
+            arrange(log2FoldChange) %>% 
+            dplyr::select(Gene.name, pvalue, sig, contains("Gcg"), contains("Ctrl"))
+    else if (group == "equal")
+        df3 <- df %>%
+            arrange(pvalue) %>% 
+            dplyr::slice(1:number) %>% 
+            arrange(log2FoldChange) %>% 
+            dplyr::select(Gene.name, pvalue, sig, contains("Gcg"), contains("Ctrl"))
+    else if (group == "sig")
+        df3 <- df %>% 
+            arrange(padj) %>% 
+            dplyr::filter(pvalue<0.05) %>% 
+            arrange(pvalue) %>% 
+            dplyr::slice(1:number) %>% 
+            dplyr::select(Gene.name, pvalue, sig, contains("Gcg"), contains("Ctrl"))
+    
+    df4 <- df3 %>% 
+        pivot_longer(., cols = c(4:9), 
+                     names_to = "condition",
+                     values_to = "count") %>% 
+        mutate(condition = fct_recode(condition,
+                                      'Control (1)' = 'Ctrl.1', 'Control (2)' = 'Ctrl.2','Control (3)' =  'Ctrl.3',
+                                      'Gcg (1)' = 'X10nM.Gcg.1','Gcg (2)' = 'X10nM.Gcg.2','Gcg (3)' = 'X10nM.Gcg.3')
+        ) %>% 
+        pivot_wider(., id_cols = c(1,2), names_from = "condition", values_from = "count",
+                    names_sort = TRUE)
+    
+    rownames(df4) <- df4$Gene.name
+    df3_counts <- as.matrix(df4[,3:8])
+    rownames(df3_counts) <- rownames(df4)
+    df3_counts <- t(scale(t(df3_counts)))
+    colnames(df3_counts) <- NULL
+    # print(df3)
+    
+    col_fun <- circlize::colorRamp2(c(-1, 0, 1), c("dodgerblue4", "white", "firebrick"))
+    pvalue_col_fun <- circlize::colorRamp2(c(0, 1, 3), c("lightgrey", "white", "firebrick1")) # color mapping for -log10(pvalue)
+    
+    pl1 <- Heatmap(df3_counts, name = "Row Z-score", col = col_fun, rect_gp = gpar(col = "white", lwd = 2),
+            column_split = c(rep("Gcg 10 nM", 3), rep("Control",3)),
+            column_order = colnames(df3_counts)[1:6],
+            clustering_method_rows = "ward.D2",
+            top_annotation = HeatmapAnnotation(Treatment = anno_block(
+                gp = gpar(fill = c("black", "red"))),
+                height = unit(0.2, "cm")),
+            left_annotation = rowAnnotation(pvalue = anno_simple(-log10(df3$pvalue),
+                                                                 which = 'row',
+                                                                 col = pvalue_col_fun,
+                                                                 pch = df3$sig,
+                                                                 pt_size = unit(1, "snpc")*0.5
+            ),
+            annotation_name_side = "bottom",
+            width = unit(0.5, "cm"),
+            annotation_name_gp = grid::gpar(fontsize = 8)),
+            width = unit(6, "cm"), row_names_side = "left", column_gap = unit(2, "mm"),
+            row_dend_side = "right",
+            row_dend_width = unit(3, "cm"),
+            row_names_max_width = max_text_width(
+                rownames(df3_counts),
+                gp = gpar(fontsize = 10)))
+    lgd_pvalue = Legend(title = "p-value", col_fun = pvalue_col_fun, at = c(0, 1, 2, 3),
+                        labels = c("1", "0.1", "0.01", "0.001"))
+    lgd_sig = Legend(pch = c("*", "**", "***"), type = "points", labels = c("< 0.05", "< 0.01", "<0.001"),
+                     legend_gp = gpar(fontsize = 7))
+    pl1_anno <- draw(pl1, annotation_legend_list = list(lgd_pvalue, lgd_sig))
 }
 
 
@@ -165,15 +245,19 @@ ggplot(df5, aes(x = Gene.name, y = log2FoldChange, fill = forcats::fct_rev(group
 ggsave("results/pdf/230620_diff_exp_top20.pdf", height = 6, width = 5, device = "pdf")
 ggsave("results/svg/230620_diff_exp_top20.svg", height = 6, width = 5, device = "svg")
 
-pdf("results/pdf/230620_heatmap_significant.pdf", width = 7, height = 12)
-heatmap_plot(df, group = "sig", number = 30)
+pdf("results/pdf/230620_heatmap_significant.pdf", width = 8, height = 6)
+heatmap_plot(df, group = "sig", number = 20)
 dev.off()
-svg("results/svg/230620_heatmap_significant.svg", width = 7, height = 12)
-heatmap_plot(df, group = "sig", number = 30)
+svg("results/svg/230620_heatmap_significant.svg", width = 8, height = 6)
+heatmap_plot(df, group = "sig", number = 20)
 dev.off()
-# png("results/png/230427_heatmap_significant.png", width = 700, height = 1000)
-# heatmap_plot(df, group = "sig", number = 30)
-# dev.off()
+
+pdf("results/pdf/230620_heatmap_withp.pdf", width = 8, height = 6)
+heatmap_plot_p_anno(df, group = "sig", number = 20)
+dev.off()
+svg("results/svg/230620_heatmap_withp.svg", width = 8, height = 6)
+heatmap_plot_p_anno(df, group = "sig", number = 20)
+dev.off()
 
 ## Boxplot differences
 res <- list()
@@ -195,7 +279,7 @@ for(a in 1:nrow(df2)){
                       aes(x=group2, y=mean_count, ymin=mean_count, 
                           ymax=mean_count+(sd_count/sqrt(3))), width = 0.5) +
             geom_jitter(color = "black", width = 0.2, height = 0) +
-            ggpubr::geom_pwc(method = "t.test", label = "p.signif", comparisons = comp,
+            ggpubr::geom_pwc(method = "wilcox.test", label = "p.signif", comparisons = comp,
                              hide.ns = TRUE, bracket.nudge.y = 1, label.size = 5) +
         ylim(NA, max(genetab$value)*1.3) +
         scale_fill_manual(guide = "none", values = c("white",ggsci::pal_lancet()(2)[2])) +
@@ -214,12 +298,6 @@ dev.off()
 svg("results/svg/boxplots_counts.svg", width = 13, height = 26)
 grid.arrange(grobs=res, ncol=7)
 dev.off()
-
-png("results/png/boxplots_counts.png", width = 1300, height = 2600)
-grid.arrange(grobs=res, ncol=7)
-dev.off()
-
-
 
 
 ## Volcano plot
@@ -262,8 +340,8 @@ ggplot(df, aes(x = log2FoldChange, y = -log10(pvalue), color = group, label = de
     #scale_x_continuous(limits = c(-0.6, 0.6)) +
     labs(x = "Log2 fold change with Gcg",
          y = "-log10(p-value)") 
-ggsave("results/pdf/230620_volcanoplot_adjpval.pdf", width = 5, height = 5, device = "pdf")    
-ggsave("results/svg/230620_volcanoplot_adjpval.svg", width = 5, height = 5, device = "svg")
+ggsave("results/pdf/230620_volcanoplot.pdf", width = 5, height = 5, device = "pdf")    
+ggsave("results/svg/230620_volcanoplot.svg", width = 5, height = 5, device = "svg")
 
 # set.seed(1234)
 # ggplot(df, aes(x = log2FoldChange, y = -log10(pvalue), color = group, label = delabel)) +

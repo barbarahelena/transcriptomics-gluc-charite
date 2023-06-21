@@ -45,16 +45,12 @@
 <polyline points='145.16,115.13 178.50,115.13 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <polyline points='161.83,115.13 161.83,119.17 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <polyline points='145.16,119.17 178.50,119.17 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<circle cx='159.26' cy='115.33' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='155.29' cy='114.92' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='171.71' cy='127.24' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='103.06' cy='143.60' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='104.63' cy='139.36' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='107.82' cy='133.66' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
-<text x='128.50' y='83.53' text-anchor='middle' style='font-size: 14.23px; font-family: "Arial";' textLength='5.54px' lengthAdjust='spacingAndGlyphs'>*</text>
-<line x1='95.17' y1='87.11' x2='95.17' y2='86.25' style='stroke-width: 0.64;' />
-<line x1='95.17' y1='86.25' x2='161.83' y2='86.25' style='stroke-width: 0.64;' />
-<line x1='161.83' y1='86.25' x2='161.83' y2='87.11' style='stroke-width: 0.64;' />
+<circle cx='150.53' cy='115.33' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='166.70' cy='114.92' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='169.29' cy='127.24' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='89.71' cy='143.60' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='97.36' cy='139.36' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='89.63' cy='133.66' r='1.95' style='stroke-width: 0.71; fill: #000000;' />
 <rect x='55.17' y='45.61' width='146.65' height='271.55' style='stroke-width: 1.16; stroke: none;' />
 </g>
 <g clip-path='url(#cpMC4wMHwyMTYuMDB8MC4wMHwzNjAuMDA=)'>

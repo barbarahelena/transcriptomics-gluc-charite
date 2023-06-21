@@ -13,12 +13,12 @@ Genes with less than 5 counts across samples were filtered out. We used DESeq2 (
 
 ## Plots
 See the `plots.R` script. The following plots were drawn:
-- Volcano plot: drawn using ggplot2 (v3.4.0). 
-- Heatmap: After zero mean, unit variance scaling of the normalized gene counts, a heatmap with differentially expressed genes was drawn using the ComplexHeatmap package (v2.12.1). The dendrogram in this plot was constructed with Ward’s method.
-- Boxplots
+- Volcano plot: drawn using ggplot2 (v3.4.0) using p-values (not padjust).
+- Heatmap: After zero mean, unit variance scaling of the normalized gene counts, a heatmap with differentially expressed genes was drawn using the ComplexHeatmap package (v2.12.1). The p-values originating from the DESeq analysis are shown in this plot. The dendrogram in this plot was constructed with Ward’s method.
+- Boxplots with t-tests (these are not necessarily the same p-values as the DESeq analysis).
 
 ## Pathway analyses
 Pathway analyses were performed using GO and KEGG (see `pathwayanalysis.R`). There were no significant pathways (padj < 0.1). One of the KEGG pathways with the lowest p-values was the hsa01522 "Endocrine resistance" pathway. That pathway, although not significant, was visualized. Plots can be found in the hsa01522 folder, in the pdf folder of the results.
 
 ## Data availability
-Data will be made available on ENA. As soon as the data are available, the repository link will be made available here.
+Data will be made available in an ENA repository ([link]: https://www.ebi.ac.uk/ena/browser/home) under accession ID PRJEB63348.
