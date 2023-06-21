@@ -180,6 +180,11 @@ df <- read.csv2("data/230620_deseq2results.csv")
 names(df)
 df$X <- NULL
 
+# df_old <- read.csv("data/01_analysis/DEG/deseq2/Control-vs-Stimulation/Differential_expression_analysis_table.csv")
+# df2_old <- df_old %>% 
+#     arrange(pvalue) %>% 
+#     slice_head(n = 25)
+
 df$group <- case_when(
     df$log2FoldChange < 0 ~ paste0("lower in Gcg"),
     df$log2FoldChange > 0 ~ paste0("higher in Gcg")
@@ -193,11 +198,15 @@ summary(is.na(df$padj))
 df2 <- df %>% group_by(group) %>% 
     arrange(pvalue) %>% 
     ungroup(.) %>% 
-    slice_head(n = 20) %>% 
+    slice_head(n = 25) %>% 
     arrange(log2FoldChange) %>% 
     mutate(Gene.name = forcats::fct_inorder(symbol))
 nrow(df2)
 head(df2)
+df2$Gene.name
+# df2_old$Gene.name
+# unique(c(as.character(df2$Gene.name), df2_old$Gene.name))
+# duplicated(c(as.character(df2$Gene.name), df2_old$Gene.name))
 
 ## DEG barplot
 ggplot(df2, aes(x = Gene.name, y = log2FoldChange, fill = forcats::fct_rev(group))) +
