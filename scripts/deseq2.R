@@ -66,8 +66,8 @@ deseq2Data <- DESeqDataSetFromMatrix(countData=rawCounts, colData=sampleData, de
 
 # Prefiltering data (low counts)
 dim(deseq2Data)
-dim(deseq2Data[rowSums(counts(deseq2Data) >= 15 ) >= 3, ]) # 14,165 of 57,500
-deseq2Data <- deseq2Data[rowSums(counts(deseq2Data) >= 15 ) >= 3, ]
+dim(deseq2Data[rowSums(counts(deseq2Data) >= 10 ) >= 3, ]) # 15,072 of 57,500
+deseq2Data <- deseq2Data[rowSums(counts(deseq2Data) >= 10 ) >= 3, ]
 
 # Run pipeline for differential expression steps 
 deseq2Data <- DESeq(deseq2Data)
